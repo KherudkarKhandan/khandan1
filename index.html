@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kherudkar Khandan Viewer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    pre {
+      background-color: #f4f4f4;
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+    #highlight {
+      background-color: yellow;
+    }
+    input, button {
+      margin: 10px 0;
+      padding: 5px 10px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Kherudkar Khandan - File Viewer</h1>
+  <p>Below is the content of the `.familyx` file:</p>
+  <div>
+    <input type="text" id="searchBox" placeholder="Search the file..." />
+    <button onclick="search()">Search</button>
+  </div>
+  <pre id="fileContent">Loading...</pre>
+  <p id="status"></p>
+
+  <script>
+    // Fetch and display the .familyx file content
+    fetch('Kherudkar-Khandan.familyx')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('File not found.');
+        }
+        return response.text();
+      })
+      .then(data => {
+        document.getElementById('fileContent').textContent = data;
+        window.fileContent = data; // Save content for search functionality
+      })
+      .catch(error => {
+        document.getElementById('fileContent').textContent = `Error: ${error.message}`;
+      });
+
+    // Search functionality
+    function search() {
+      const searchBox = document.getElementById('searchBox');
+      const query = searchBox.value.trim();
+      const fileContent = window.fileContent;
+
+      if (!query) {
+        document.getElementById('status').textContent = "Enter a search term.";
+        return;
+      }
+
+      const regex = new RegExp(query, 'gi');
+      const matches = fileContent.match(regex);
+
+      if (matches) {
+        const highlighted = fileContent.replace(regex, match => `<span id="highlight">${match}</span>`);
+        document.getElementById('fileContent').innerHTML = highlighted;
+        document.getElementById('status').textContent = `Found ${matches.length} occurrence(s) of "${query}".`;
+      } else {
+        document.getElementById('status').textContent = `No occurrences of "${query}" found.`;
+      }
+    }
+  </script>
+</body>
+</html>
